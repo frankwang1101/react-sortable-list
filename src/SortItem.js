@@ -8,7 +8,11 @@ export default class SortItem extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            ...this.props.item
+            top: this.props.top,
+            left: this.props.left,
+            index: this.props.index,
+            id: this.props.id,
+            el: this.props.el,
         }
         this._startMove = this._startMove.bind(this)
         this._move = this._move.bind(this)
@@ -19,9 +23,12 @@ export default class SortItem extends Component {
         this.move = false
         this.stateQueue = []
     }
-    componentWillReceiveProps() {
+    componentWillReceiveProps(nextProps) {
         //次数判断，如果当前组件没有移动，则重新渲染，否则不渲染
-
+        console.log('receive props')
+        if (!this.move) {
+            this.setState(Object.assign(this.state, nextProps))
+        }
     }
     _startMove(e) {
         this.start = true
@@ -65,14 +72,17 @@ export default class SortItem extends Component {
     }
     _endMove() {
         this.start = false
-        this.move = false
-        let { index, top, left } = this.state
-        //通知父元素重排
-        this.props.change({
-            index,
-            top,
-            left
-        })
+        if (this.move) {
+            this.move = false
+            console.log('end notify')
+            let { index, top, left } = this.state
+            //通知父元素重排
+            this.props.change({
+                index,
+                top,
+                left
+            }, false)
+        }
     }
     addStateQueue(item) {
         this.stateQueue.push(item)
