@@ -188,7 +188,7 @@ export default class Sortable extends Component {
                 //一个元素，则此元素坐标即为
                 toIndex = validList[0].el.index
             } else if (checkNum === 2) {
-                //此时判断，如果是左边没有， 则判断上下边，然后取最大值的最左侧，其余同理
+                //此时判断，如果是左边没有， 则判断上下边，然后取最大值的索引，其余同理
                 const getPos = getPostOrigin(_ => directions[_].el)
                 const getLen = getLenOrigin(directions)
                 let pos1;
@@ -220,7 +220,6 @@ export default class Sortable extends Component {
                 let l2 = getLen(pos2, py)
                 toIndex = l1 > l2 ? directions[px].el.index : directions[py].el.index
             } else {
-                //判断缺失位置
                 let cornerInverse = [3, 4, 1, 2]
                 const getPos = getPostOrigin(_ => directions[_].el)
                 const getLen = getLenOrigin(directions)
@@ -232,6 +231,7 @@ export default class Sortable extends Component {
                         let pos = getPos(i, cornerInverse[i])
                         len = getLen(pos, i)
                     } else {
+                        //如果存在缺失角，则判断相对item的对角距离 如 item1 的左上角 与 移动元素左上角距离
                         let reverseIdx = i => i % 2 ? i ^ 4 : i ^ 2
                         let ri = reverseIdx(i)
                         let pos_ = getPos(ri, ri + 1)
@@ -246,20 +246,12 @@ export default class Sortable extends Component {
                 })
                 toIndex = maxInfo.index
             }
-            //移动目标元素到新位置
-            // items.splice(toIndex, 0, target)
-            // this._arrangeList(items.map(v => v.el))
             let oldItems = this.state.items.slice();
-            // let sortList = oldItems.map(v => ({
-            //     top: v.top,
-            //     left: v.left,
-            //     index: v.index
-            // })).filter(x => x.index !== index)
-            // sortList.sort((a, b) => a.index - b.index)
             toIndex = Math.min(toIndex, oldItems.length - 1)
             let filterItems = oldItems.filter(x => x.id != id)
             filterItems.sort((x, y) => x.index - y.index)
             let tItem = oldItems.find(x => x.id === id)
+            //移动目标元素到新位置
             if (toIndex === oldItems.length - 1) {
                 let tempItem = this._Calc(parseInt(toIndex / this.cols, 10), toIndex % this.cols, null)
                 tItem.top = tempItem.top
@@ -269,8 +261,8 @@ export default class Sortable extends Component {
                 tItem.left = filterItems[toIndex].left
             }
             tItem.index = toIndex
-            // 判断整个数组index
-            // from > to ? [to,) +1 : [- to) -1 & (to, ) +1
+            // 判断过滤后数组idx
+            // [to, ) + 1
             filterItems.forEach((item, i) => {
                 let nextItem = null
                 if(item.index >= toIndex){
@@ -288,32 +280,6 @@ export default class Sortable extends Component {
                 item.index = nextItem.index
 
             })
-
-            //---废弃
-            //获取位置
-            // let tidx = oldItems.findIndex(i => i.id === tId)
-            // oldItems[index].top = items_[tidx].top
-            // oldItems[index].left = items_[tidx].left
-            // oldItems[index].index = tidx
-            // for(var i = tidx, j = tidx;i < items_.length;i++, j++){
-            //     if(j === index) j++;
-            //     if(i + 1<items_.length){
-            //         oldItems[j].top = items_[i + 1].top
-            //         oldItems[j].left = items_[i + 1].left
-            //         oldItems[j].index = (i + 1)
-            //     }else{
-            //         let obj = this._Calc(parseInt((j+1)/this.cols, 10), j%this.cols, null)
-            //         oldItems[j].top = obj.top
-            //         oldItems[j].left = obj.left
-            //         oldItems[j].index = j
-            //     }
-            // }
-            // if(index + 1 === oldItems.length){
-            //     let temp = this._Calc(parseInt(index/ this.cols, 10), index%this.cols, null)
-            //     oldItems[index - 1].top = temp.top                
-            //     oldItems[index - 1].left = temp.left                
-            //     oldItems[index - 1].index = index                
-            // }
             this.setState({
                 items: oldItems
             })
