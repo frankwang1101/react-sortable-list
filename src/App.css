@@ -38,6 +38,11 @@
 .sort-item{
   position: absolute;
   display: block;
+  transition: all 0.8s ease-in-out;
+}
+
+.move-item{
+  transition: none;
 }
 
 .sort-wrap{

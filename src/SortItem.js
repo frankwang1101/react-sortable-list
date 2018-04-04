@@ -75,12 +75,13 @@ export default class SortItem extends Component {
         if (this.move) {
             this.move = false
             console.log('end notify')
-            let { index, top, left } = this.state
+            let { index, top, left, id } = this.state
             //通知父元素重排
             this.props.change({
                 index,
                 top,
-                left
+                left,
+                id
             }, false)
         }
     }
